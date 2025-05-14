@@ -16,7 +16,7 @@
           console.log('Service Worker registration failed:', error);
         });
     }
-  </script>  
+  </script>
   <style>
     body {
       margin: 0;
@@ -33,6 +33,20 @@
       font-size: 7.8rem;
       margin-bottom: 2rem;
       color: #ffffff;
+    }
+    .progress-bar {
+      width: 80%;
+      height: 1.5rem;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 1rem;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #ffffff;
+      width: 0%;
+      transition: width 0.3s ease;
     }
     .reset-btn {
       background: rgba(255, 255, 255, 0.4);
@@ -53,14 +67,20 @@
 </head>
 <body>
   <div class="counter" id="counter">0</div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress"></div>
+  </div>
   <button class="reset-btn" onclick="resetCounter()">Refresh</button>
 
   <script>
     let counter = 0;
     let lastTouch = 0;
+    const ziel = 100;
 
     function updateDisplay() {
       document.getElementById('counter').textContent = counter;
+      const prozent = Math.min(100, Math.round((counter / ziel) * 100));
+      document.getElementById('progress').style.width = prozent + '%';
     }
 
     function resetCounter() {
@@ -73,6 +93,7 @@
       if (now - lastTouch > 100) {
         counter++;
         updateDisplay();
+        if (navigator.vibrate) navigator.vibrate(50);
         lastTouch = now;
       }
     });
