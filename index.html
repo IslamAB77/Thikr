@@ -1,79 +1,93 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ThikrIslam</title>
-  <link rel="icon" href="ChatGPT Image 14. Mai 2025, 01_29_57.png" type="image/png">
-  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="ChatGPT Image 14. Mai 2025, 01_29_57.png" type="image/png" />
+  <link rel="manifest" href="/manifest.json" />
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/service-worker.js')
-        .then((registration) => console.log('Service Worker registered:', registration.scope))
-        .catch((error) => console.log('Service Worker registration failed:', error));
+        .then(reg => console.log('SW registered:', reg.scope))
+        .catch(err => console.log('SW failed:', err));
     }
   </script>
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      height: 100dvh;
-      overflow: hidden;
-      font-family: Consolas, monospace;
-      user-select: none;
-      background: linear-gradient(to bottom, #064e3b, #a7f3d0);
+      height: 100%;
+      width: 100%;
+      overscroll-behavior: none;
+      touch-action: manipulation;
+    }
+
+    body {
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: space-evenly;
+      align-items: center;
+      background: linear-gradient(to bottom, #064e3b, #a7f3d0);
+      font-family: Consolas, monospace;
+      user-select: none;
+      overflow: hidden;
     }
+
     .bismillah {
       font-size: 3rem;
       color: #fff;
     }
+
     .counter {
       font-size: 6rem;
       color: #fff;
     }
+
     .progress-bar {
       width: 80%;
       height: 1rem;
-      background: rgba(255,255,255,0.2);
+      background: rgba(255, 255, 255, 0.2);
       border-radius: 1rem;
       overflow: hidden;
     }
+
     .progress-fill {
       height: 100%;
       background: #fff;
       width: 0%;
       transition: width 0.3s ease;
     }
+
     .reset-btn {
-      background: rgba(255,255,255,0.4);
+      background: rgba(255, 255, 255, 0.4);
       color: #064e3b;
       border: none;
       padding: 0.8rem 1.5rem;
       border-radius: 1rem;
       font-size: 1.2rem;
       cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       backdrop-filter: blur(4px);
     }
+
     .reset-btn:active {
-      background: rgba(255,255,255,0.6);
+      background: rgba(255, 255, 255, 0.6);
     }
   </style>
 </head>
-<body>
+<body ontouchstart="">
   <div class="bismillah">﷽</div>
   <div class="counter" id="counter">0</div>
-  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress"></div>
+  </div>
   <button class="reset-btn" onclick="resetCounter()">Refresh</button>
 
   <script>
     let counter = 0;
     let lastTouch = 0;
-    const ziel = 33;
+    const ziel = 100;
 
     function updateDisplay() {
       document.getElementById('counter').textContent = counter;
