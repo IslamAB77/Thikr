@@ -70,7 +70,7 @@
 
     document.body.addEventListener('touchstart', e => {
       const now = Date.now();
-      if (now - lastTouch > 300) {
+      if (now - lastTouch > 100) {
         counter++;
         updateDisplay();
         lastTouch = now;
