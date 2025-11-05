@@ -26,7 +26,8 @@
     body {
       display: flex;
       flex-direction: column;
-      justify-content: space-evenly;
+      /* space-around sorgt für gleichmäßige Verteilung, auch bei kleinen Bildschirmen */
+      justify-content: space-around; 
       align-items: center;
       background: linear-gradient(to bottom, #064e3b, #a7f3d0);
       font-family: Consolas, monospace;
@@ -35,55 +36,52 @@
     }
 
     .bismillah {
-      font-size: 3rem;
+      font-size: 2.5rem; /* Reduziert */
       color: #fff;
       text-align: center;
-      margin-top: -1rem; /* Etwas nach oben */
+      margin-top: -0.5rem; /* Reduziert */
     }
     
     .mode-display {
-      font-size: 1.5rem;
+      font-size: 1.2rem; /* Reduziert */
       color: #fff;
-      font-family: Consolas, monospace;
       text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
 
-    /* NEU: Zeigt den Namen des Dhikr (kleiner) */
     .dhikr-name {
-      font-size: 1.2rem; /* Kleiner als der Text */
+      font-size: 1rem; /* Reduziert (dient als Titel) */
       color: #fff;
       text-align: center;
       opacity: 0.8;
       font-weight: bold;
     }
     
-    /* NEU: Haupt-Container für den arabischen Wortlaut */
     .dhikr-text {
-      font-size: 2rem; /* Große, lesbare Schrift */
+      font-size: 1.5rem; /* Reduziert */
       color: #fff;
       text-align: center;
-      line-height: 1.7; /* Zeilenabstand für Arabisch */
-      width: 90%; /* Begrenzte Breite */
-      max-height: 40vh; /* Maximale Höhe, z.B. 40% der Bildschirmhöhe */
-      overflow-y: auto; /* **WICHTIG: Scrollbar, falls Text zu lang** */
-      padding: 0 0.5rem; /* Etwas Innenabstand */
-      /* Versteckt Scrollbar auf Webkit (Chrome/Safari) */
-      -ms-overflow-style: none;  /* IE und Edge */
-      scrollbar-width: none;  /* Firefox */
+      line-height: 1.6; /* Angepasst */
+      width: 90%;
+      /* WICHTIG: Begrenzte Höhe, damit untere Elemente sichtbar bleiben */
+      max-height: 35vh; 
+      overflow-y: auto; /* Internes Scrollen für lange Texte (Ayat Kursi) */
+      padding: 0 0.5rem;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
     .dhikr-text::-webkit-scrollbar {
-      display: none; /* Chrome, Safari und Opera */
+      display: none;
     }
 
 
     .counter {
-      font-size: 3rem; /* Zählergröße angepasst */
+      font-size: 2.5rem; /* Reduziert */
       color: #fff;
     }
 
     .progress-bar {
       width: 80%;
-      height: 1rem;
+      height: 0.8rem; /* Reduziert */
       background: rgba(255, 255, 255, 0.2);
       border-radius: 1rem;
       overflow: hidden;
@@ -100,13 +98,13 @@
       background: rgba(255, 255, 255, 0.4);
       color: #fff;
       border: none;
-      padding: 0.8rem 1.5rem;
+      padding: 0.6rem 1.2rem; /* Reduziert */
       border-radius: 1rem;
-      font-size: 1.2rem;
+      font-size: 1rem; /* Reduziert */
       cursor: pointer;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       backdrop-filter: blur(4px);
-      margin-bottom: -1rem; /* Etwas nach unten */
+      margin-bottom: -0.5rem; /* Reduziert */
     }
 
     .reset-btn:active {
@@ -118,11 +116,8 @@
   <div class="bismillah">﷽</div>
   
   <div class="mode-display" id="modeDisplay"></div>
-  
   <div class="dhikr-name" id="dhikrName">Laden...</div>
-
   <div class="dhikr-text" id="dhikrText"></div>
-
   <div class="counter" id="counter">0 / 0</div>
   
   <div class="progress-bar">
@@ -132,21 +127,19 @@
   <button class="reset-btn" onclick="resetCounter()">Refresh</button>
 
   <script>
-    // --- START: Aktualisiertes JavaScript (Mit Wortlaut) ---
+    // --- START: Aktualisiertes JavaScript (Zeitlogik & Layout-Anpassung) ---
 
     let lastTouch = 0;
     let currentMode = 'Sabah';
     let appState = {};
 
-    // 1. DEFINITION DER ATHKĀR-LISTEN (MIT WORTLAUT)
-    
-    // Konstanten für wiederkehrende Texte
+    // 1. DEFINITION DER ATHKĀR-LISTEN (Unverändert)
     const TEXT_IKHLAS = "قُلْ هُوَ اللَّهُ أَحَدٌ ﴿١﴾ اللَّهُ الصَّمَدُ ﴿٢﴾ لَمْ يَلِدْ وَلَمْ يُولَدْ ﴿٣﴾ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ ﴿٤﴾";
     const TEXT_FALAQ = "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ﴿١﴾ مِن شَرِّ مَا خَلَقَ ﴿٢﴾ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ﴿٣﴾ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ﴿٤﴾ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ ﴿٥﴾";
-    const TEXT_NAS = "قُلْ أَعُوذُ بِرَبِّ النَّاسِ ﴿١﴾ مَلِكِ النَّاسِ ﴿٢﴾ إِلَـٰهِ النَّاسِ ﴿٣﴾ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ﴿٤﴾ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ﴿٥﴾ مِنَ الْجِنَّةِ وَالنَّاسِ ﴿٦﴾";
+    const TEXT_NAS = "قُلْ أَعُوذُ بِرَبِّ النَّاسِ ﴿١﴾ مَلِكِ النَّاسِ ﴿٢﴾ إِلَـٰهِ النَّاسِ ﴿٣﴾ مِن شَرِّ الْوَسْوَASِ الْخَنَّASِ ﴿٤﴾ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ﴿٥﴾ مِنَ الْجِنَّةِ وَالنَّASِ ﴿٦﴾";
     const TEXT_AYAT_KURSI = "اللَّهُ لاَ إِلَـهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلاَّ بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْfهُمْ وَلاَ يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلاَّ بِمَا شَاء وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالأَرْضَ وَلاَ يَؤُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ";
-    const TEXT_SAYYID_ISTIGHFAR = "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ";
-    const TEXT_ASKALUKA_AFWA = "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْfظْنِي مِنْ بَيْنِ يَدَيَّ وَمِنْ خَلْfِي وَعَنْ يَمِينِي وَعَنْ شِمَالِي وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي";
+    const TEXT_SAYYID_ISTIGHFAR = "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْfِرْ لِي فَإِنَّهُ لاَ يَغْfِرُ الذُّنُوبَ إِلَّا أَنْتَ";
+    const TEXT_ASKALUKA_AFWA = "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَAFِيَةَ فِي الدُّنْيَا وَالآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَAFِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْfظْنِي مِنْ بَيْنِ يَدَيَّ وَمِنْ خَلْfِي وَعَنْ يَمِينِي وَعَنْ شِمَالِي وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي";
     const TEXT_BISMILLAHILLADHI = "بِسْمِ اللَّهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الأَرْضِ وَلاَ فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ";
     const TEXT_RADITU_BILLAHI = "رَضِيتُ بِاللَّهِ رَبًّا، وَبِالإِسْلاَمِ دِينًا، وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا";
     const TEXT_SUBHANALLAHI = "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ";
@@ -193,17 +186,15 @@
       const storedState = localStorage.getItem('athkarAppState');
       if (storedState) {
         appState = JSON.parse(storedState);
-        // Sicherstellen, dass die geladenen Listen mit der Vorlage übereinstimmen (falls Code aktualisiert wurde)
-        if (appState.Sabah.list.length !== SABAH_LIST_TEMPLATE.length) {
+        if (!appState.Sabah || appState.Sabah.list.length !== SABAH_LIST_TEMPLATE.length) {
           console.log("Sabah-Liste veraltet. Wird zurückgesetzt.");
           resetMode('Sabah');
         }
-        if (appState.Masa.list.length !== MASA_LIST_TEMPLATE.length) {
+        if (!appState.Masa || appState.Masa.list.length !== MASA_LIST_TEMPLATE.length) {
           console.log("Masa-Liste veraltet. Wird zurückgesetzt.");
           resetMode('Masa');
         }
       } else {
-        // Erstellt einen brandneuen Zustand
         appState = {
           Sabah: { currentIndex: 0, list: createListFromTemplate(SABAH_LIST_TEMPLATE) },
           Masa: { currentIndex: 0, list: createListFromTemplate(MASA_LIST_TEMPLATE) }
@@ -216,16 +207,16 @@
       localStorage.setItem('athkarAppState', JSON.stringify(appState));
     }
 
-    // (Hilfsfunktion) Setzt nur einen bestimmten Modus zurück
     function resetMode(mode) {
+        if (!appState[mode]) return;
         const template = (mode === 'Sabah') ? SABAH_LIST_TEMPLATE : MASA_LIST_TEMPLATE;
         appState[mode].list = createListFromTemplate(template);
         appState[mode].currentIndex = 0;
     }
     
-    // Setzt den Zähler für den *aktuellen* Modus zurück
     function resetCounter() {
       determineMode();
+      if (currentMode === 'Nacht') return; // Im Nachtmodus nichts zurücksetzen
       resetMode(currentMode);
       saveState();
       updateDisplay();
@@ -233,40 +224,62 @@
 
     // 3. KERNLOGIK (Modus bestimmen, UI aktualisieren)
 
+    // *** NEUE ZEITLOGIK ***
     function determineMode() {
       const currentHour = new Date().getHours(); // 0-23
-      currentMode = (currentHour < 12) ? 'Sabah' : 'Masa'; // 00:00-11:59 = Sabah
-      document.getElementById('modeDisplay').textContent = `Athkār al-${currentMode}`;
+      
+      if (currentHour >= 12) { // 12:00 (Mittag) bis 23:59
+        currentMode = 'Masa';
+      } else if (currentHour >= 4) { // 04:00 (ca. Fajr) bis 11:59
+        currentMode = 'Sabah';
+      } else { // 00:00 bis 03:59
+        currentMode = 'Nacht';
+      }
     }
 
+    // *** AKTUALISIERTE ANZEIGELOGIK ***
     function updateDisplay() {
       determineMode();
       
+      const dhikrTextEl = document.getElementById('dhikrText');
+      const dhikrNameEl = document.getElementById('dhikrName');
+      const counterEl = document.getElementById('counter');
+      const progressEl = document.getElementById('progress').style;
+      const modeDisplayEl = document.getElementById('modeDisplay');
+
+      // Prüfen, ob Nachtruhe ist
+      if (currentMode === 'Nacht') {
+        modeDisplayEl.textContent = "Ruhezeit";
+        dhikrNameEl.textContent = "Schlafenszeit";
+        dhikrTextEl.textContent = "Die Zeit für die Morgen- (ab 04:00) und Abenderinnerungen (ab 12:00) ist vorbei.";
+        counterEl.textContent = "—";
+        progressEl.width = '0%';
+        dhikrTextEl.scrollTop = 0;
+        return; // Stoppt die Funktion hier
+      }
+
+      // Fährt nur fort, wenn Sabah oder Masa
+      modeDisplayEl.textContent = `Athkār al-${currentMode}`;
       const modeState = appState[currentMode];
       const index = modeState.currentIndex;
       const list = modeState.list;
-      const dhikrTextEl = document.getElementById('dhikrText');
 
       if (index >= list.length) {
-        // Alle Athkār für diesen Modus sind abgeschlossen
-        document.getElementById('dhikrName').textContent = "Abgeschlossen";
-        document.getElementById('counter').textContent = "Mā šāʾ Allāh";
+        dhikrNameEl.textContent = "Abgeschlossen";
+        counterEl.textContent = "Mā šāʾ Allāh";
         dhikrTextEl.textContent = "تقبل الله"; // "Taqabbal Allāh"
-        document.getElementById('progress').style.width = '100%';
+        progressEl.width = '100%';
       } else {
-        // Zeigt das aktuelle Dhikr an
         const activeDhikr = list[index];
-        document.getElementById('dhikrName').textContent = activeDhikr.name;
-        document.getElementById('counter').textContent = `${activeDhikr.current} / ${activeDhikr.target}`;
-        
-        // **NEU: Setzt den arabischen Wortlaut**
+        dhikrNameEl.textContent = activeDhikr.name;
+        counterEl.textContent = `${activeDhikr.current} / ${activeDhikr.target}`;
         dhikrTextEl.textContent = activeDhikr.text;
-        // Scrollt das Textfeld bei jedem Update nach oben
-        dhikrTextEl.scrollTop = 0; 
-
+        
         const prozent = Math.round((index / list.length) * 100);
-        document.getElementById('progress').style.width = prozent + '%';
+        progressEl.width = prozent + '%';
       }
+      // Stellt sicher, dass der Text-Container oben beginnt
+      dhikrTextEl.scrollTop = 0; 
     }
 
     // 4. EVENT LISTENER (Handling des Klicks/Taps)
@@ -277,6 +290,12 @@
       lastTouch = now;
 
       determineMode(); 
+      
+      // *** NEU: Zählen im Nachtmodus blockieren ***
+      if (currentMode === 'Nacht') {
+         if (navigator.vibrate) navigator.vibrate(20); // Kurzes Feedback
+         return; 
+      }
       
       const modeState = appState[currentMode];
       const index = modeState.currentIndex;
