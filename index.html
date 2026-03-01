@@ -155,7 +155,7 @@
     <button class="mode-btn" id="salahBtn" type="button">بعد الصلاة</button>
   </div>
 
-  <div class="dhikr-text" id="dhikrText">سُبْحَانَ ٱللَّٰهِ</div>
+  <div class="dhikr-text" id="dhikrText"></div>
 
   <p class="counter" id="counter">0 / 100</p>
 
@@ -253,7 +253,7 @@
       salahBtn.classList.toggle('active', state.mode === 'salah');
 
       if (state.mode === 'normal') {
-        dhikrText.textContent = 'سُبْحَانَ ٱللَّٰهِ';
+        dhikrText.textContent = '';
         counter.textContent = `${state.normalCount} / 100`;
         progress.style.width = `${(state.normalCount / 100) * 100}%`;
         dhikrText.style.direction = 'rtl';
