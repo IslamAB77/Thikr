@@ -253,6 +253,7 @@
       salahBtn.classList.toggle('active', state.mode === 'salah');
 
       if (state.mode === 'normal') {
+        dhikrText.style.display = 'none';
         dhikrText.textContent = '';
         counter.textContent = `${state.normalCount} / 100`;
         progress.style.width = `${(state.normalCount / 100) * 100}%`;
@@ -260,6 +261,7 @@
         return;
       }
 
+      dhikrText.style.display = 'block';
       const s = state.salah;
 
       if (s.currentIndex >= s.list.length) {
