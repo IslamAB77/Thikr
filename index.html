@@ -174,15 +174,13 @@
 
   <p class="mode-display" id="modeDisplay">Normal Modus</p>
   <p class="dhikr-name" id="dhikrName">Normaler Thikr-Zähler</p>
-  <div class="dhikr-text" id="dhikrText">Tippe irgendwo auf den Bildschirm. Ziel: 100.</div>
+  <div class="dhikr-text" id="dhikrText">سُبْحَانَ ٱللَّٰهِ</div>
 
   <p class="counter" id="counter">0 / 100</p>
 
   <div class="progress-bar">
     <div class="progress-fill" id="progress"></div>
   </div>
-
-  <p class="hint">Jeder Tipp auf den Bildschirm zählt 1x.</p>
 
   <script>
     const STORAGE_KEY = 'thikr_counter_state_v4';
@@ -316,7 +314,7 @@
       if (state.mode === 'normal') {
         modeDisplay.textContent = 'Normal Modus';
         dhikrName.textContent = 'Normaler Thikr-Zähler';
-        dhikrText.textContent = 'Tippe irgendwo auf den Bildschirm. Ziel: 100.';
+        dhikrText.textContent = 'سُبْحَانَ ٱللَّٰهِ';
         counter.textContent = `${state.normalCount} / 100`;
         progress.style.width = `${(state.normalCount / 100) * 100}%`;
         dhikrText.style.direction = 'rtl';
