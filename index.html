@@ -90,7 +90,7 @@
       border-radius: 0.9rem;
       background: var(--glass);
       border: 1px solid var(--glass-2);
-      font-size: clamp(1.15rem, 4.2vw, 1.9rem);
+      font-size: clamp(1.4rem, 5.3vw, 2.45rem);
       line-height: 1.75;
       text-align: center;
       color: var(--white);
@@ -192,7 +192,10 @@
     ];
 
     function makeSalahList() {
-      return SALAH_TEMPLATE.map(item => ({ ...item, current: 0 }));
+      return SALAH_TEMPLATE.map(item => ({
+        ...item,
+        current: (item.target === 33 || item.target === 34) ? 1 : 0
+      }));
     }
 
     function createFreshState() {
